@@ -27,13 +27,14 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
     }
-    compileSdkVersion 30
-    buildToolsVersion '30.0.0'
+    namespace 'net.toload.main.hd'
+    compileSdkVersion 36
+
     defaultConfig {
         applicationId "net.toload.main.hd"
 
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion 24
+        targetSdkVersion 36
         versionCode 620
         versionName '6.2.0'
     }
@@ -42,6 +43,10 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     packagingOptions {
         exclude 'META-INF/LICENSE'
