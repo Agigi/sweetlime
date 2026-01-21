@@ -40,6 +40,8 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -2900,7 +2902,7 @@ public class LIMEService extends InputMethodService implements
                 mCandidateInInputView.initViews();
                 mCandidateViewInInputView = (CandidateView) mCandidateInInputView.findViewById(R.id.candidatesView);
                 mCandidateViewInInputView.setService(this);
-
+                applyNavigationBarInsets(mCandidateInInputView);
             }
             if (mCandidateView != mCandidateViewInInputView)
                 mCandidateView = mCandidateViewInInputView;
@@ -2910,7 +2912,7 @@ public class LIMEService extends InputMethodService implements
                 mInputView = (LIMEKeyboardView) LayoutInflater.from(mThemeContext).inflate(R.layout.input, null);
                 mInputView.setOnKeyboardActionListener(this);
                 mInputView.setHardwareAcceleratedDrawingEnabled(mIsHardwareAcceleratedDrawingEnabled);
-
+                applyNavigationBarInsets(mInputView);
             }
             mCandidateView = mCandidateViewStandAlone;
 
@@ -2935,6 +2937,31 @@ public class LIMEService extends InputMethodService implements
         }
 
 
+    }
+
+    /**
+     * Apply navigation bar insets to the input view to prevent the keyboard
+     * from being overlapped by the system navigation bar on edge-to-edge displays
+     * such as Samsung ONE UI.
+     */
+    private void applyNavigationBarInsets(View inputView) {
+        if (inputView == null) return;
+        
+        ViewCompat.setOnApplyWindowInsetsListener(inputView, (view, windowInsets) -> {
+            androidx.core.graphics.Insets navBarInsets = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            // Apply navigation bar height as bottom padding
+            view.setPadding(
+                view.getPaddingLeft(),
+                view.getPaddingTop(),
+                view.getPaddingRight(),
+                navBarInsets.bottom
+            );
+            // Return the insets so they can be consumed by other views if needed
+            return windowInsets;
+        });
+        
+        // Request insets to be applied
+        ViewCompat.requestApplyInsets(inputView);
     }
 
     /**
